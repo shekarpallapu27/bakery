@@ -1,0 +1,223 @@
+[2019-11-11 00:37:11] CRITICAL [product_except.post:153] Event loop is already running
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 145, in post
+    d_name = request.data[0].get('dept_name')
+  File "/home/shekar/bakery/product/views.py", line 145, in post
+    d_name = request.data[0].get('dept_name')
+  File "/usr/lib/python3.5/bdb.py", line 48, in trace_dispatch
+    return self.dispatch_line(frame)
+  File "/usr/lib/python3.5/bdb.py", line 66, in dispatch_line
+    self.user_line(frame)
+  File "/usr/lib/python3.5/pdb.py", line 259, in user_line
+    self.interaction(frame, None)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/IPython/core/debugger.py", line 294, in interaction
+    OldPdb.interaction(self, frame, traceback)
+  File "/usr/lib/python3.5/pdb.py", line 346, in interaction
+    self._cmdloop()
+  File "/usr/lib/python3.5/pdb.py", line 319, in _cmdloop
+    self.cmdloop()
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/IPython/terminal/debugger.py", line 91, in cmdloop
+    line = self.pt_app.prompt() # reset_current_buffer=True)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/prompt_toolkit/shortcuts/prompt.py", line 797, in prompt
+    return run_sync()
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/prompt_toolkit/shortcuts/prompt.py", line 786, in run_sync
+    return self.app.run(inputhook=self.inputhook, pre_run=pre_run2)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/prompt_toolkit/application/application.py", line 736, in run
+    return run()
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/prompt_toolkit/application/application.py", line 709, in run
+    run_until_complete(f, inputhook=inputhook)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/prompt_toolkit/eventloop/defaults.py", line 126, in run_until_complete
+    return get_event_loop().run_until_complete(future, inputhook=inputhook)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/prompt_toolkit/eventloop/posix.py", line 58, in run_until_complete
+    raise Exception('Event loop is already running')
+Exception: Event loop is already running
+
+[2019-11-11 00:39:47] CRITICAL [product_except.delete:115] ("Cannot delete some instances of model 'Location' because they are referenced through a protected foreign key: 'Department.location_id'", <QuerySet [<Department: p1>, <Department: p2>, <Department: p3>, <Department: p44>]>)
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 110, in delete
+    Location.objects.filter(pk=loc_id).delete()
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/query.py", line 616, in delete
+    collector.collect(del_query)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/deletion.py", line 223, in collect
+    field.remote_field.on_delete(self, field, sub_objs, self.using)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/deletion.py", line 28, in PROTECT
+    sub_objs
+django.db.models.deletion.ProtectedError: ("Cannot delete some instances of model 'Location' because they are referenced through a protected foreign key: 'Department.location_id'", <QuerySet [<Department: p1>, <Department: p2>, <Department: p3>, <Department: p44>]>)
+
+[2019-11-11 00:40:34] CRITICAL [product_except.delete:115] ("Cannot delete some instances of model 'Location' because they are referenced through a protected foreign key: 'Department.location_id'", <QuerySet [<Department: p1>, <Department: p2>, <Department: p3>, <Department: p44>]>)
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 110, in delete
+    Location.objects.filter(pk=loc_id).delete()
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/query.py", line 616, in delete
+    collector.collect(del_query)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/deletion.py", line 223, in collect
+    field.remote_field.on_delete(self, field, sub_objs, self.using)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/deletion.py", line 28, in PROTECT
+    sub_objs
+django.db.models.deletion.ProtectedError: ("Cannot delete some instances of model 'Location' because they are referenced through a protected foreign key: 'Department.location_id'", <QuerySet [<Department: p1>, <Department: p2>, <Department: p3>, <Department: p44>]>)
+
+[2019-11-11 00:41:08] CRITICAL [product_except.delete:115] ("Cannot delete some instances of model 'Location' because they are referenced through a protected foreign key: 'Department.location_id'", <QuerySet [<Department: p1>, <Department: p2>, <Department: p3>, <Department: p44>]>)
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 110, in delete
+    Location.objects.filter(pk=loc_id).delete()
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/query.py", line 616, in delete
+    collector.collect(del_query)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/deletion.py", line 223, in collect
+    field.remote_field.on_delete(self, field, sub_objs, self.using)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/deletion.py", line 28, in PROTECT
+    sub_objs
+django.db.models.deletion.ProtectedError: ("Cannot delete some instances of model 'Location' because they are referenced through a protected foreign key: 'Department.location_id'", <QuerySet [<Department: p1>, <Department: p2>, <Department: p3>, <Department: p44>]>)
+
+[2019-11-11 00:44:32] CRITICAL [product_except.delete:115] ("Cannot delete some instances of model 'Location' because they are referenced through a protected foreign key: 'Department.location_id'", <QuerySet [<Department: p1>, <Department: p2>, <Department: p3>, <Department: p44>]>)
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 110, in delete
+    Location.objects.filter(pk=loc_id).delete()
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/query.py", line 616, in delete
+    collector.collect(del_query)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/deletion.py", line 223, in collect
+    field.remote_field.on_delete(self, field, sub_objs, self.using)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/deletion.py", line 28, in PROTECT
+    sub_objs
+django.db.models.deletion.ProtectedError: ("Cannot delete some instances of model 'Location' because they are referenced through a protected foreign key: 'Department.location_id'", <QuerySet [<Department: p1>, <Department: p2>, <Department: p3>, <Department: p44>]>)
+
+[2019-11-11 00:49:44] CRITICAL [product_except.delete:115] ("Cannot delete some instances of model 'Location' because they are referenced through a protected foreign key: 'Department.location_id'", <QuerySet [<Department: p1>, <Department: p2>, <Department: p3>, <Department: p44>]>)
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 111, in delete
+    Location.objects.filter(pk=loc_id).delete()
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/query.py", line 616, in delete
+    collector.collect(del_query)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/deletion.py", line 223, in collect
+    field.remote_field.on_delete(self, field, sub_objs, self.using)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/deletion.py", line 28, in PROTECT
+    sub_objs
+django.db.models.deletion.ProtectedError: ("Cannot delete some instances of model 'Location' because they are referenced through a protected foreign key: 'Department.location_id'", <QuerySet [<Department: p1>, <Department: p2>, <Department: p3>, <Department: p44>]>)
+
+[2019-11-11 01:03:55] CRITICAL [product_except.delete:116] ("Cannot delete some instances of model 'Location' because they are referenced through a protected foreign key: 'Department.location_id'", <QuerySet [<Department: p1>, <Department: p2>, <Department: p3>, <Department: p44>]>)
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 111, in delete
+    Location.objects.filter(pk=loc_id).delete()
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/query.py", line 616, in delete
+    collector.collect(del_query)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/deletion.py", line 223, in collect
+    field.remote_field.on_delete(self, field, sub_objs, self.using)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/deletion.py", line 28, in PROTECT
+    sub_objs
+django.db.models.deletion.ProtectedError: ("Cannot delete some instances of model 'Location' because they are referenced through a protected foreign key: 'Department.location_id'", <QuerySet [<Department: p1>, <Department: p2>, <Department: p3>, <Department: p44>]>)
+
+[2019-11-11 02:12:55] CRITICAL [product_except.get:322] type object 'SkuDetails' has no attribute 'objects'
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 316, in get
+    sub_cate_obj = SkuDetails.objects.all()
+AttributeError: type object 'SkuDetails' has no attribute 'objects'
+
+[2019-11-11 02:15:12] CRITICAL [product_except.get:322] type object 'SkuDetails' has no attribute 'objects'
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 316, in get
+    sub_cate_obj = SkuDetails.objects.all()
+AttributeError: type object 'SkuDetails' has no attribute 'objects'
+
+[2019-11-11 02:15:14] CRITICAL [product_except.get:322] type object 'SkuDetails' has no attribute 'objects'
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 316, in get
+    sub_cate_obj = SkuDetails.objects.all()
+AttributeError: type object 'SkuDetails' has no attribute 'objects'
+
+[2019-11-11 02:16:25] CRITICAL [product_except.get:322] type object 'SkuDetails' has no attribute 'objects'
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 316, in get
+    sub_cate_obj = SkuDetails.objects.all()
+AttributeError: type object 'SkuDetails' has no attribute 'objects'
+
+[2019-11-11 02:18:55] CRITICAL [product_except.get:322] type object 'SkuDetails' has no attribute 'objects'
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 316, in get
+    sub_cate_obj = SkuDetails.objects.all()
+AttributeError: type object 'SkuDetails' has no attribute 'objects'
+
+[2019-11-11 02:20:31] CRITICAL [product_except.get:322] type object 'SkuDetails' has no attribute 'objects'
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 316, in get
+    sku_obj = SkuDetails.objects.all()
+AttributeError: type object 'SkuDetails' has no attribute 'objects'
+
+[2019-11-11 02:21:51] CRITICAL [product_except.get:320] type object 'SkuDetails' has no attribute 'objects'
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 314, in get
+    sku_obj = SkuDetails.objects.all()
+AttributeError: type object 'SkuDetails' has no attribute 'objects'
+
+[2019-11-11 02:36:17] CRITICAL [product_except.post:343] name 'sku_name' is not defined
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 338, in post
+    SkuDetails.objects.create(sku_name=sku_name,location_id=loc_obj,department_id=dept_obj,category_id=cate_obj,sub_category_id=sub_cate_obj)
+NameError: name 'sku_name' is not defined
+
+[2019-11-11 02:43:27] CRITICAL [product_except.post:343] name 'sub_cate_obj' is not defined
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 338, in post
+    SkuDetails.objects.create(sku_name=sku_name,location_id=loc_obj,department_id=dept_obj,category_id=cate_obj,sub_category_id=sub_cate_obj)
+NameError: name 'sub_cate_obj' is not defined
+
+[2019-11-11 02:57:05] CRITICAL [product_except.put:355] NOT NULL constraint failed: product_skudetails.sku_name
+Traceback (most recent call last):
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return Database.Cursor.execute(self, query, params)
+sqlite3.IntegrityError: NOT NULL constraint failed: product_skudetails.sku_name
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 350, in put
+    update_sku.update(sku_name=sku_name)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/query.py", line 647, in update
+    rows = query.get_compiler(self.db).execute_sql(CURSOR)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/sql/compiler.py", line 1199, in execute_sql
+    cursor = super(SQLUpdateCompiler, self).execute_sql(result_type)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/sql/compiler.py", line 894, in execute_sql
+    raise original_exception
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/sql/compiler.py", line 884, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/backends/utils.py", line 80, in execute
+    return super(CursorDebugWrapper, self).execute(sql, params)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/utils.py", line 94, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/utils/six.py", line 685, in reraise
+    raise value.with_traceback(tb)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return Database.Cursor.execute(self, query, params)
+django.db.utils.IntegrityError: NOT NULL constraint failed: product_skudetails.sku_name
+
+[2019-11-11 02:59:05] CRITICAL [product_except.delete:365] name 'sku_id' is not defined
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 360, in delete
+    SkuDetails.objects.filter(pk=sku_id).delete()
+NameError: name 'sku_id' is not defined
+
+[2019-11-11 03:25:45] CRITICAL [product_except.get:342] Cannot resolve keyword 'sub_category_id' into field. Choices are: category_id, category_id_id, sub_cate_id, sub_cate_name, subcategory_skudetails
+Traceback (most recent call last):
+  File "/home/shekar/bakery/product/views.py", line 334, in get
+    sub_cate_obj = SubCategory.objects.filter(sub_category_id__category_id__department_id__location_id__pk=locc_id,sub_category_id__category_id__department_id__pk=deparr_id,sub_category_id__category_id__pk=catee_id,sub_category_id__pk=subcatee_id)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/query.py", line 784, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/query.py", line 802, in _filter_or_exclude
+    clone.query.add_q(Q(*args, **kwargs))
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/sql/query.py", line 1250, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/sql/query.py", line 1276, in _add_q
+    allow_joins=allow_joins, split_subq=split_subq,
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/sql/query.py", line 1154, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg)
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/sql/query.py", line 1034, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+  File "/home/shekar/bakery_env/lib/python3.5/site-packages/django/db/models/sql/query.py", line 1352, in names_to_path
+    "Choices are: %s" % (name, ", ".join(available)))
+django.core.exceptions.FieldError: Cannot resolve keyword 'sub_category_id' into field. Choices are: category_id, category_id_id, sub_cate_id, sub_cate_name, subcategory_skudetails
+
