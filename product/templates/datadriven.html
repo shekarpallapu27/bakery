@@ -1,0 +1,963 @@
+@extends('layouts.app')
+@section('content')
+<div class="card card_w shadow mb-4">
+   
+        <div class="col-md-12">
+            <h3 style="padding-left: 10px;display: inline-block;">Action Items</h3>
+            @if(Auth::user()->lkp_role_id!=3)
+            <div style="display: inline-flex; margin: 20px;float:right" class="pull-right add-info">
+                 <button type="button" class="add-item cust__btn" style="margin-left: 10px">Add Topic</button>
+            </div>
+         </div>
+         
+      
+   
+   <div class="card-body m-h-8">
+    
+             @if (Session::has('success'))
+                @foreach (Session::get('success') as $success)
+       
+                 <div class="alert alert-success alert-block">
+
+                  <button type="button" class="close" data-dismiss="alert">×</button> 
+
+                        <strong>{{ $success }}</strong>
+
+                </div>
+                @endforeach
+                @endif
+            <div id="additem-form" style="display:none;">
+               <div class="col-sm-12" style="border: solid 1px #ece8e8;">
+                  <h3 class="box-title" style="font-size: 18px;">Add Topic</h3>
+                  <div><span id="vaidation-message-save" class="error"></span></div>
+                  <form name='item form' class="driven-form" id ='item-form' method="POST" action="{{url('saveitem')}}">
+                     @csrf 
+                     <div class="colsm-12">
+                       <div class="col-sm-4">
+                          <label for="item">Topic</label>
+                          <input type="text" class="form-control" id="item" name="item" placeholder="Enter Topic" value="">
+                       </div>
+                       <div class="col-sm-2">
+                          <label for="client">Owner</label>
+                          <select id="owner" name="owner" class="form-control">
+                             @foreach($clients as $client)
+                             <option value="{{ $client->id }}">{{ $client->name }}</option>
+                             @endforeach
+                          </select>
+                       </div>
+                       <div class="col-sm-2">
+                          <label for="core-functional-area">Core Functional Area</label>
+                          <select class="form-control" name="functional_area" id="functional_area">
+                            <option value="Sales">Sales</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Operations">Operations</option>
+                            <option value="Finance">Finance</option>
+                            <option style="color:blue" value="other"><i>Other</i></option>
+                          </select>  
+                          <input style="display:none" type="text" class="form-control other_functional" name="other_functional" id="other_functional" placeholder="Core Functional Area">
+                       </div>
+                       <div class="col-sm-2">
+                          <label for="dat-assined">Date Assigned</label>
+                          <input type="text" class="form-control" id="date_assigned" name="date_assigned" placeholder="Date Assigned" value="<?php echo date('m/d/y'); ?>" readonly>
+                       </div>
+                       <div class="col-sm-2">
+                          <label for="duedate">Due Date</label>
+                          <input type="text" class="form-control" id="due_date" name="due_date" placeholder="Due Date" value="">
+                       </div>
+                       <div class="col-sm-2">
+                          <label for="duedate">Priority</label>
+                          <select class="form-control" id="priority" name="priority">
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                          </select>
+                       </div>
+                      
+                       <div class="col-sm-4">
+                          <label for="notes">Notes</label>
+                          <textarea rows="6" cols="80" id="comments" name="comments"></textarea>
+                       </div>
+                       
+                     </div>
+                     <div class="clearfix"></div>
+                     <div class="col-sm-1" style="padding-bottom:5px; padding-top:5px;padding-right: 0;">
+                      <input type="hidden" id="item_id" name="item_id" value="">
+                        <input type="submit" class="save-btn cust__btn" value="Save">
+                        <span id="loading" style="display:none;"><img src="{{ URL::asset('img/ajax-loader.gif') }}"></span>
+                     </div>
+                     <div class="col-sm-2" style=" padding-bottom: 30px;padding-top:5px">
+                      
+                        <button type="button" class="btn  btn-block btn-default" style="width:auto; margin-left: 5px;">Cancel</button>
+                     </div>
+                  </form>
+               </div>
+            </div>
+            @endif
+       
+      <div class="table-responsive" style="padding-top:8px">
+         <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+               <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Topics In-Progress</a>
+            </li>
+            <li class="nav-item">
+               <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Topics Completed</a>
+            </li>
+
+             <li class="nav-item">
+               <a class="nav-link" id="rejected-tab" data-toggle="tab" href="#rejected" role="tab" aria-controls="rejected" aria-selected="false">Topics Rejected</a>
+            </li>
+            
+         </ul>
+         <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab" style="width:98%;margin-top:10px;">
+           
+               <table class="table-hover table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                  <thead>
+                     <tr>
+                        <th width="16%">Topic</th>
+                        <th width="10%">Assigned To</th>
+                        <th width="5%">Functional Area</th>
+                        <th width="8%">Date Assigned</th>
+                        <th width="8%">Due Date</th>
+                        <th width="10%">Priority</th>
+                        <th width="10%">Status</th>
+                        <th width="25%">Notes</th>
+                        @if(Auth::user()->lkp_role_id==3)
+                        <th width="2%">Mark as Reject</th>
+                        <th width="2%">Current Status</th>
+
+                        @else
+                        <th width="2%">Mark As Complete</th>
+                        @endif
+                        @if(Auth::user()->lkp_role_id!=3)
+                        <th>Delete</th>
+                        @endif
+                     </tr>
+                  </thead>
+                  <tbody>
+                     @foreach($tracker_items as $tracker_item) 
+                     <tr>
+                       @if(Auth::user()->lkp_role_id!=3)
+                        <td text="{{ $tracker_item->id }}" >
+                          <a style="cursor:pointer;color: #e35c0f;" data-toggle="modal" data-target="#modalEditForm_{{$tracker_item->id}}">{{ $tracker_item->item }}</a>
+                         
+                        </td>
+                       @else
+                        <td>{{ $tracker_item->item }}</td>
+                       @endif 
+                        <td>{{ $tracker_item->name }}</td>
+                        <td>{{ $tracker_item->functional_area }}</td>
+                        <td>{{ date("m/d/Y", strtotime($tracker_item->date_assigned)) }}</td>
+                        <td>{{ date("m/d/Y", strtotime($tracker_item->due_date)) }}</td>
+                        <td>{{ $tracker_item->priority }}</td>
+                        <?php 
+                           $date1=date_create(date("Y/m/d"));
+                           $date2=date_create($tracker_item->due_date);
+                           $diff=date_diff($date1,$date2);
+                           
+                           if($tracker_item->status=="Completed"){
+                             echo "<td></td>";
+                           }
+                           else if(($diff->d>3 && $diff->invert==0)){
+                             echo "<td style='background-color:green'></td>";
+                           }
+                           else if(($diff->d>=0 && $diff->d<=3 && $diff->invert==0)){
+                             echo "<td style='background-color:yellow'></td>";
+                           }
+                           else if(($diff->d>=0 && $diff->invert==1)){
+                             echo "<td style='background-color:red'></td>";
+                           }
+                           ?>
+                        
+                        <td>
+                           <?php 
+                              $comments_data = App\Http\Helpers\Utils::getComments($tracker_item->id);
+                              ?>
+                           @if(count($comments_data)>1)
+                           <p>{{ $comments_data[0]->comments }} </p>
+                           <p> By <b>{{$comments_data[0]->name}}</b> {{ date("m/d/y h:i:s", strtotime($comments_data[0]->created_at)) }}</p>
+                           <div class="hoverable" text="{{$comments_data[0]->id}}"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></div>
+                           <div class="show-on-hover  show-on-hover-8 show-on-hover-{{$comments_data[0]->id}}">
+                              @foreach($comments_data as $comment)
+                              <div class="blck">
+                                 <p class="hover-comments">{{ $comment->comments }} </p>
+                                 <p class="hover-comments date__">By <b>{{$comment->name}}</b> {{ date("m/d/y h:i:s", strtotime($comment->created_at)) }}</p>
+                              </div>
+                              @endforeach
+                           </div>
+                           @else
+                           @foreach($comments_data as $comment)
+                           <p>{{ $comment->comments }} </p>
+                           <p> By <b>{{$comment->name}}</b> {{ date("m/d/y h:i:s", strtotime($comment->created_at)) }}</p>
+                           
+                           @endforeach
+                           @endif
+                           
+                           <a data-toggle="modal" data-target="#modalStatusForm_{{$tracker_item->id}}" style="float:right"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                        </td>
+                        @if(Auth::user()->lkp_role_id!=3)
+                        <td style="text-align:center">
+                           @if($tracker_item->status=="Completed")
+                           Completed
+                           @else
+                           <!-- <select class="mark-complete" name="mark-complete" id="mark-complete"
+                              data-txt="{{$tracker_item->id}}">
+                              <option>Select</option>
+                              <option>Completed</option>
+                              <option>Rejected</option>
+                           </select>  -->  
+                           <input type="checkbox" class="mark-complete" name="mark-complete" id="mark-complete" data-txt="{{$tracker_item->id}}" value="Completed">
+                           @endif
+                        
+                        </td>
+                        @else
+                        
+                          @if(Auth::user()->lkp_role_id==3) 
+                          <td>  
+                           <input type="checkbox" class="mark-complete" name="mark-complete" id="mark-complete" data-txt="{{$tracker_item->id}}" value="Rejected">
+                          @endif
+                        </td>   
+                        <td>{{ $tracker_item->status }}</td>
+                        @endif 
+                        @if(Auth::user()->lkp_role_id!=3)
+                        <td>
+                          <span onclick="confirm_click({{$tracker_item->id}});">
+                          <a href="#" style="color:black"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                          </span>
+                        </td>
+                        @endif
+                     </tr>
+
+                     <div class="modal fade" id="modalEditForm_{{$tracker_item->id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                          <form name='item form' class="driven-form" id ='item-edit-form_{{$tracker_item->id}}' method="POST" action="{{url('updateItem')}}">
+                          @csrf 
+                           <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                 <div class="modal-header text-center">
+                                    <h4 class="modal-title w-100 font-weight-bold">Edit Task Details</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                 </div>
+                                 <div class="col-sm-12" style="padding-top:8px;"><span id="vaidation-message-edit" class="error"></span></div>
+                                 <div class="col-sm-12" style="padding-top:10px;">
+
+                                    <div class="col-sm-3">Topic</div>
+                                    <div class="col-sm-8">
+                                       <input type="text" class="form-control" id="item_edit_{{$tracker_item->id}}" name="item_edit_{{$tracker_item->id}}" placeholder="Enter Task" value="{{$tracker_item->item}}">
+                                    </div>
+                                 </div>
+                                 
+
+                                  <div class="col-sm-12" style="padding-top:10px;">
+                                    <div class="col-sm-3">Core Functional Area</div>
+                                    <div class="col-sm-8">
+                                    <select class="form-control" name="functional_area_edit_{{$tracker_item->id}}" id="functional_area_edit_{{$tracker_item->id}}">
+                                      <option value="Sales" <?php if($tracker_item->functional_area=="Sales"){ echo "selected"; }?>>Sales</option>
+                                      <option value="Marketing" <?php if($tracker_item->functional_area=="Marketing"){ echo "selected"; }?>>Marketing</option>
+                                      <option value="Operations" <?php if($tracker_item->functional_area=="Operations"){ echo "selected"; }?>>Operations</option>
+                                      <option value="Finance" <?php if($tracker_item->functional_area=="Finance"){ echo "selected"; }?>>Finance</option>
+                                      @foreach($functional_area_data as $functional_data)
+                                      <option value="{{$functional_data->functional_area}}" <?php if($tracker_item->functional_area==$functional_data->functional_area){ echo "selected"; }?>>{{$functional_data->functional_area}}</option>
+                                      @endforeach
+                                      <option style="color:blue" value="other"><i>Other</i></option>
+                                    </select>  
+                                    <div style="padding-top:5px;">
+                                    <input style="display:none;" type="text" class="form-control other_functional" name="other_functional_edit_{{$tracker_item->id}}" id="other_functional_edit_{{$tracker_item->id}}" placeholder="Core Functional Area">
+                                    </div>
+                                  </div>
+                                 </div>
+
+                                 <div class="col-sm-12" style="padding-top:10px;">
+
+                                    <div class="col-sm-3">Priority</div>
+                                    <div class="col-sm-8">
+                                       <select id="priority_edit_{{$tracker_item->id}}" name="priority_edit_{{$tracker_item->id}}" class="form-control">
+                                         
+                                         <option <?php if($tracker_item->priority=="High"){ echo "selected"; }?> value="High">High</option>
+                                         <option <?php if($tracker_item->priority=="Medium"){ echo "selected"; } ?> value="Medium">Medium</option>
+                                         <option <?php if($tracker_item->priority=="Low"){ echo "selected"; } ?> value="Low">Low</option>
+                                        
+                                      </select>
+                                    </div>
+                                 </div>
+                                 
+                                 
+                                 <div class="col-sm-12" style="padding-top:10px;">
+
+                                    <div class="col-sm-3">Owner</div>
+                                    <div class="col-sm-8">
+                                       <select id="owner_edit_{{$tracker_item->id}}" name="owner_edit_{{$tracker_item->id}}" class="form-control">
+                                         @foreach($clients as $client)
+                                         <option value="{{ $client->id }}" <?php if($client->id==$tracker_item->created_to) echo "selected"; ?>>{{ $client->name }}</option>
+                                         @endforeach
+                                      </select>
+                                    </div>
+                                 </div>
+                                 
+
+                                 <div class="col-sm-12" style="padding-top:10px;">
+
+                                <div class="col-sm-3">Due Date</div>
+                                    <div class="col-sm-8">
+                                       <input type="text" class="form-control due_edit" id="due_date_edit_{{$tracker_item->id}}" name="due_date_edit_{{$tracker_item->id}}" placeholder="Due Date" value="{{ date('m/d/Y', strtotime($tracker_item->due_date)) }}">
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-12 modal-footer d-flex justify-content-center" style="padding-top:15px;">
+                                  <input type="hidden" id="item_id_edit_{{$tracker_item->id}}" name="item_id_edit_{{$tracker_item->id}}" value="{{$tracker_item->id}}">
+                      
+                                   <input type="submit" data-tid="{{$tracker_item->id}}" class="edit-btn cust__btn" value="Save">
+                                   <span id="loading" style="display:none;"><img src="{{ URL::asset('img/ajax-loader.gif') }}"></span>
+                                 </div>
+                              </div>
+                           </div>
+                        </form>
+                     </div>
+                      
+                     <div class="modal fade" id="modalStatusForm_{{$tracker_item->id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <form id="update-comments-{{$tracker_item->id}}" class="driven-form">
+                           <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                           <input type="hidden" name="track_id" id="track_id" value="{{$tracker_item->id}}">
+                           <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                 <div class="modal-header text-center">
+                                    <h4 class="modal-title w-100 font-weight-bold">Notes - {{$tracker_item->item}}</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                 </div>
+                                 
+                                 
+                                  
+                                  <div class="col-sm-12">
+                                    <div style="padding:5px">
+                                    <span id="vaidation-message-{{$tracker_item->id}}" class="error"></span>
+                                    </div>
+                                  @if(Auth::user()->lkp_role_id==3)  
+                                  <div class="col-sm-3">Assigned To</div>
+                                    <div class="col-sm-7">
+                                      <select id="assign_change_{{$tracker_item->id}}" name="assign_change_{{$tracker_item->id}}" class="form-control">
+                                       @foreach($clients as $client)
+                                       <option value="{{ $client->id }}" <?php if($client->id==$tracker_item->created_to){ echo "selected"; }?>>{{ $client->name }}</option>
+                                       @endforeach
+                                    </select>
+                                    </div>
+                                  </div>
+                                  @endif
+
+                                  <div class="col-sm-12" style="padding-top:5px;">
+
+                                    <div class="col-sm-3">Comments</div>
+                                    <div class="col-sm-8">
+                                       <textarea rows="4" cols="35" id="comments_{{$tracker_item->id}}" name="comments_{{$tracker_item->id}}" class="form-control"></textarea>
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-12 modal-footer d-flex justify-content-center" style="padding-top:5px;">
+                                    <input type="submit" class="update-comments cust__btn" value="Submit" data-txt="{{$tracker_item->id}}">
+                                 </div>
+                              </div>
+                           </div>
+                        </form>
+                     </div>
+
+                     
+
+                     @endforeach
+                  </tbody>
+               </table>
+               <div style="display: inline-flex; margin: 20px;">
+                  <ul class="legend">
+                     <li><span class="green"></span> In-Progress</li>
+                     <li><span class="yellow"></span> 3 Days prior to due date</li>
+                     <li><span class="red"></span> Due date exceeded</li>
+                  </ul>
+               </div>
+            </div>
+            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab" style="width:98%;margin-top:10px;">
+               <table class="table table-bordered table-hover" id="dataTable_completed" width="100%" cellspacing="0">
+                  <thead>
+                     <tr>
+                        <th width="22%">Topic</th>
+                        <th width="10%">Assigned To</th>
+                        <th width="5%">Functional Area</th>
+                        <th width="8%">Date Assigned</th>
+                        <th width="8%">Due Date</th>
+                        <th width="8%">Priority</th>
+                        <th width="8%">Completed On</th>
+                        <th width="40%">Notes</th>
+                        <th width="10%">Status</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     @foreach($tracker_items_completed as $tracker_items_completed) 
+                     <tr>
+                      @if(Auth::user()->lkp_role_id!=3)
+                       <td style="cursor:pointer;color: #e35c0f;" data-toggle="modal" data-target="#modalCompleteEditForm_{{$tracker_items_completed->id}}">{{ $tracker_items_completed->item }}</td>
+                      @else
+                       <td>{{ $tracker_items_completed->item }}</td>
+                      @endif
+                       
+                        <td>{{ $tracker_items_completed->name }}</td>
+                        <td>{{ $tracker_items_completed->functional_area }}</td>
+                        <td>{{ date("m/d/Y", strtotime($tracker_items_completed->date_assigned)) }}</td>
+                        <td>{{ date("m/d/Y", strtotime($tracker_items_completed->due_date)) }}</td>
+                        <td>{{ $tracker_items_completed->priority }}</td>
+                        <td>{{ date("m/d/Y", strtotime($tracker_items_completed->completed_on)) }}</td>
+                        <td style="position: relative;">
+                           <?php 
+                              $comments_data_completed = App\Http\Helpers\Utils::getComments($tracker_items_completed->id);
+                              ?>
+                          @if(count($comments_data_completed)>1)
+                           <p>{{ $comments_data_completed[0]->comments }} </p>
+                           <p> By <b>{{$comments_data_completed[0]->name}}</b> {{ date("m/d/y h:i:s", strtotime($comments_data_completed[0]->created_at)) }}</p>
+                           <div class="hoverable" text="{{$comments_data_completed[0]->id}}"><i class="fa fa-ellipsis-h"></i></div>
+                           <div class="show-on-hover show-on-hover-{{$comments_data_completed[0]->id}}">
+                              @foreach($comments_data_completed as $comment)
+                              <div class="blck">
+                                 <p class="hover-comments">{{ $comment->comments }} </p>
+                                 <p class="hover-comments date__">By <b>{{$comment->name}}</b> {{ date("m/d/y h:i:s", strtotime($comment->created_at)) }}</p>
+                              </div>
+                              @endforeach
+                           </div>
+                           @else
+                           @foreach($comments_data_completed as $comment)
+                           <p>{{ $comment->comments }} </p>
+                           <p> By <b>{{$comment->name}}</b> {{ date("m/d/y h:i:s", strtotime($comment->created_at)) }}</p>
+                           
+                           @endforeach
+                           @endif
+                           
+                        </td>
+                        <!-- @if(Auth::user()->lkp_role_id!=3)
+                        <td style="text-align:center">Completed</td>
+                        @else
+                        <td>{{ $tracker_items_completed->status }}</td>
+                        @endif  -->
+                       <?php 
+                           $datecopmleted=date_create($tracker_items_completed->completed_on);
+                           $date_due=date_create($tracker_items_completed->due_date);
+                           $diff=date_diff($datecopmleted,$date_due);
+
+                            if((($diff->d>=0) && $diff->invert==0)){
+                             echo "<td style='background-color:green'></td>";
+                             
+                           }
+                           else if(($diff->d<=3 && $diff->invert==0)){
+                             echo "<td style='background-color:yellow'></td>";
+                             
+                           }
+                           else if(($diff->d>0 && $diff->invert==1)){
+                             echo "<td style='background-color:red'></td>";
+                             
+                           }
+                           
+                           ?>
+                         
+                     </tr>
+                     <div class="modal fade" id="modalCompleteEditForm_{{$tracker_items_completed->id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                          <form name='item form' class="driven-form" id ='item-edit-form_{{$tracker_items_completed->id}}' method="POST" action="{{url('updateItem')}}">
+                          @csrf 
+                           <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                 <div class="modal-header text-center">
+                                    <h4 class="modal-title w-100 font-weight-bold">Edit Topic Details</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                 </div>
+                                 <div class="col-sm-12" style="padding-top:8px;"><span id="vaidation-message-edit" class="error"></span></div>
+                                 <div class="col-sm-12" style="padding-top:10px;">
+
+                                    <div class="col-sm-3">Topic</div>
+                                    <div class="col-sm-8">
+                                       <input type="text" class="form-control" id="item_edit_{{$tracker_items_completed->id}}" name="item_edit_{{$tracker_items_completed->id}}" placeholder="Enter Topic" value="{{$tracker_items_completed->item}}">
+                                    </div>
+                                 </div>
+                                 
+                                 <div class="col-sm-12" style="padding-top:10px;">
+                                    <div class="col-sm-3">Core Functional Area</div>
+                                    <div class="col-sm-8">
+                                    <select class="form-control" name="functional_area_edit_{{$tracker_items_completed->id}}" id="functional_area_edit_{{$tracker_items_completed->id}}">
+                                      <option value="Sales" <?php if($tracker_items_completed->functional_area=="Sales"){ echo "selected"; }?>>Sales</option>
+                                      <option value="Marketing" <?php if($tracker_items_completed->functional_area=="Marketing"){ echo "selected"; }?>>Marketing</option>
+                                      <option value="Operations" <?php if($tracker_items_completed->functional_area=="Operations"){ echo "selected"; }?>>Operations</option>
+
+
+                                      @foreach($functional_area_data as $functional_data)
+                                      <option value="{{$functional_data->functional_area}}" <?php if($tracker_items_completed->functional_area==$functional_data->functional_area){ echo "selected"; }?>>{{$functional_data->functional_area}}</option>
+                                      @endforeach
+                                      <option style="color:blue" value="other"><i>Other</i></option>
+                                    </select>  
+                                    <div style="padding-top:5px;">
+                                    <input style="display:none;" type="text" class="form-control other_functional" name="other_functional_edit_{{$tracker_items_completed->id}}" id="other_functional_edit_{{$tracker_items_completed->id}}" placeholder="Core Functional Area">
+                                    </div>
+                                  </div>
+                                 </div>
+                                 
+                                 <div class="col-sm-12" style="padding-top:10px;">
+
+                                    <div class="col-sm-3">Customer</div>
+                                    <div class="col-sm-8">
+                                       <select id="owner_edit_{{$tracker_items_completed->id}}" name="owner_edit_{{$tracker_items_completed->id}}" class="form-control">
+                                         @foreach($clients as $client)
+                                         <option value="{{ $client->id }}" <?php if($client->id==$tracker_items_completed->created_to) echo "selected"; ?>>{{ $client->name }}</option>
+                                         @endforeach
+                                      </select>
+                                    </div>
+                                 </div>
+                                 
+
+                                 <div class="col-sm-12" style="padding-top:10px;">
+
+                                <div class="col-sm-3">Due Date</div>
+                                    <div class="col-sm-8">
+                                       <input type="text" class="form-control due_edit" id="due_date_edit_{{$tracker_items_completed->id}}" name="due_date_edit_{{$tracker_items_completed->id}}" placeholder="Due Date" value="{{ date('m/d/Y', strtotime($tracker_items_completed->due_date)) }}">
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-12 modal-footer d-flex justify-content-center" style="padding-top:15px;">
+                                  <input type="hidden" id="item_id_edit_{{$tracker_items_completed->id}}" name="item_id_edit_{{$tracker_items_completed->id}}" value="{{$tracker_items_completed->id}}">
+                      
+                                   <input type="submit" data-tid="{{$tracker_items_completed->id}}" class="edit-btn cust__btn" value="Save">
+                                   <span id="loading" style="display:none;"><img src="{{ URL::asset('img/ajax-loader.gif') }}"></span>
+                                 </div>
+                              </div>
+                           </div>
+                        </form>
+                     </div>
+                     @endforeach
+                  </tbody>
+               </table>
+                 <div style="display: inline-flex; margin: 20px;">
+                    <ul class="legend">
+                       <li><span class="green"></span> In-Progress</li>
+                       <li><span class="yellow"></span> 3 Days prior to due date</li>
+                       <li><span class="red"></span> Due date exceeded</li>
+                    </ul>
+                 </div>
+            </div>
+
+            <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab" style="width:98%;margin-top:10px;">
+               <table class="table table-bordered table-hover" id="dataTable_rejected" width="100%" cellspacing="0">
+                  <thead>
+                     <tr>
+                        <th width="22%">Topic</th>
+                        <th width="10%">Assigned To</th>
+                        <th width="5%">Functional Area</th>
+                        <th width="8%">Date Assigned</th>
+                        <th width="8%">Due Date</th>
+                        <th width="8%">Priority</th>
+                        <th width="8%">Completed On</th>
+                        <th width="40%">Notes</th>
+                        <th width="10%">Status</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+
+                     @foreach($tracker_items_rejected as $tracker_items_reject) 
+                     <tr>
+                        <td style="cursor:pointer;color: #e35c0f;" data-toggle="modal" data-target="#modalCompleteEditForm_{{$tracker_items_reject->id}}">
+                          {{ $tracker_items_reject->item }}</td>
+                        <td>{{ $tracker_items_reject->name }}</td>
+                        <td>{{ $tracker_items_reject->functional_area }}</td>
+                        <td>{{ date("m/d/Y", strtotime($tracker_items_reject->date_assigned)) }}</td>
+                        <td>{{ date("m/d/Y", strtotime($tracker_items_reject->due_date)) }}</td>
+                        <td>{{ $tracker_items_reject->priority }}</td>
+                        <td>{{ date("m/d/Y", strtotime($tracker_items_reject->completed_on)) }}</td>
+                        <td style="position: relative;">
+                           <?php 
+                              $comments_data_rejected = App\Http\Helpers\Utils::getComments($tracker_items_reject->id);
+                              ?>
+                          @if(count($comments_data_rejected)>1)
+                           <p>{{ $comments_data_rejected[0]->comments }} </p>
+                           <p> By <b>{{$comments_data_rejected[0]->name}}</b> {{ date("m/d/y h:i:s", strtotime($comments_data_rejected[0]->created_at)) }}</p>
+                           <div class="hoverable" text="{{$comments_data_rejected[0]->id}}"><i class="fa fa-ellipsis-h"></i></div>
+                           <div class="show-on-hover show-on-hover-{{$comments_data_rejected[0]->id}}">
+                              @foreach($comments_data_rejected as $comment)
+                              <div class="blck">
+                                 <p class="hover-comments">{{ $comment->comments }} </p>
+                                 <p class="hover-comments date__">By <b>{{$comment->name}}</b> {{ date("m/d/y h:i:s", strtotime($comment->created_at)) }}</p>
+                              </div>
+                              @endforeach
+                           </div>
+                           @else
+                           @foreach($comments_data_rejected as $comment)
+                           <p>{{ $comment->comments }} </p>
+                           <p> By <b>{{$comment->name}}</b> {{ date("m/d/y h:i:s", strtotime($comment->created_at)) }}</p>
+                           
+                           @endforeach
+                           @endif
+                           
+                        </td>
+                        <!-- @if(Auth::user()->lkp_role_id!=3)
+                        <td style="text-align:center">Completed</td>
+                        @else
+                        <td>{{ $tracker_items_completed->status }}</td>
+                        @endif  -->
+                       <?php 
+                           $datecopmleted=date_create($tracker_items_reject->completed_on);
+                           $date_due=date_create($tracker_items_reject->due_date);
+                           $diff=date_diff($datecopmleted,$date_due);
+
+                            if((($diff->d>=0) && $diff->invert==0)){
+                             echo "<td style='background-color:green'></td>";
+                             
+                           }
+                           else if(($diff->d<=3 && $diff->invert==0)){
+                             echo "<td style='background-color:yellow'></td>";
+                             
+                           }
+                           else if(($diff->d>0 && $diff->invert==1)){
+                             echo "<td style='background-color:red'></td>";
+                             
+                           }
+                           
+                           ?>
+                         
+                     </tr>
+                     @endforeach
+                  </tbody>
+                  </table>  
+            </div>
+            
+            
+         </div>
+      </div>
+   </div>
+</div>
+<script type="text/javascript">
+   $(document).ready(function() {
+   
+     var date = new Date();
+     var today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+   
+     $('.date_assign').datepicker({
+       format: "mm/dd/yyyy",
+       todayHighlight: true,
+       //startDate: today,
+       autoclose: true
+      });
+
+     $('#due_date').datepicker({
+       format: "mm/dd/yyyy",
+       todayHighlight: true,
+       startDate: today,
+       autoclose: true
+      });
+
+     $('.due_edit').datepicker({
+       format: "mm/dd/yyyy",
+       todayHighlight: true,
+       startDate: today,
+       autoclose: true
+      });
+
+     
+     //enquiry_table = $('#example').DataTable();
+      cat_table = $('#dataTable').DataTable( {
+         //"order": false,
+         "language": {
+             //"search": '<i class="fa fa-search"></i>',
+             "searchPlaceholder": "Search by any attribute",
+             
+         },
+        "order": [[4,'asc']],
+        "columnDefs" : [{"targets":4, "sType": "eu_date"}],
+     }); 
+
+      $('#dataTable_rejected').DataTable( {
+         //"order": false,
+         "language": {
+             //"search": '<i class="fa fa-search"></i>',
+             "searchPlaceholder": "Search by any attribute",
+             
+         },
+        "order": [[4,'desc']],
+        "columnDefs" : [{"targets":3, "sType": "eu_date"}],
+     }); 
+
+       
+   
+     
+       
+   $(document).on('click', '.add-item', function(e) {
+     $("#additem-form").show();
+     $("#item-form").trigger("reset"); 
+     $("itmeid").val("");
+     $(".add-item").hide();
+     $("#item_comment_id").val("");
+     $("#item_id").val("");
+   });
+   $(document).on('click', '.btn-default', function(e) {
+     $("#additem-form").hide();
+     $("#item-form").trigger("reset"); 
+     $("itmeid").val("");
+     $(".add-item").show();
+   });
+   
+   $(".save-btn").on('click', function(e){
+       e.preventDefault(); 
+      
+     if($("#item").val().trim()==""){
+      
+       $("#vaidation-message-save").html("Enter Topic");
+       return false;
+     }else if($("#due_date").val().trim()==""){
+       $("#vaidation-message-save").html("Enter Due Date");
+       return false;
+     }
+     else{
+   
+   
+      $.ajax({
+    
+                    url : "{{url('saveitem')}}",
+                    type : 'POST',
+                    data : $("#item-form").serialize(),
+                    dataType:'text',
+                    beforeSend: function(){
+                      $("#loading").show();
+                      //$(".enquiry-status-form").hide();
+                    },
+                    complete: function(){
+                      $("#loading").hide();
+                      //$(".enquiry-status-form").show();
+                    },
+                    success : function(data) {  
+                     
+                      data = data.split("|");            
+                        if(data[0]=="Successfully Saved"){
+                          
+                         $("#item-form").trigger("reset"); 
+                         alert(data[0]); 
+                         location.reload();
+                        }
+                        else if(data[0]=="Successfully Updated"){
+                          
+                         //$("#cat-form").trigger("reset");
+                         alert(data[0]); 
+                         location.reload();
+   
+                        }
+                        else{
+                          alert("Something went wrong");
+                        }
+                    },
+                    error : function(request,error)
+                    {
+                        alert(error);
+                    }
+                });
+   
+     }
+    
+   
+    
+   
+   });  
+   
+   
+   $(".update-comments").on('click', function(e){
+   
+     e.preventDefault(); 
+     tid = $(this).attr("data-txt");
+     //alert($("#update-comments-"+tid).serialize());
+     if($("#comments_"+tid).val().trim()==""){
+       $("#vaidation-message-"+tid).html("Enter any comments to submit");
+       return false;
+     }else{
+        $(this).attr("disabled","disabled")
+         $.ajax({
+    
+                    url : "{{url('/updateComments')}}",
+                    type : 'POST',
+                    data : $("#update-comments-"+tid).serialize(),
+                    dataType:'text',
+                    beforeSend: function(){
+                      $("#loading").show();
+                      //$(".enquiry-status-form").hide();
+                    },
+                    complete: function(){
+                      $("#loading").hide();
+                      //$(".enquiry-status-form").show();
+                    },
+                    success : function(data) {  
+                      data = data.split("|");            
+                        if(data[0]=="Successfully Saved"){
+                         $(".add-item").show(); 
+                         $("#update-comments-"+tid).trigger("reset"); 
+                         alert(data[0]); 
+                         location.reload();
+                        }
+                        else if(data[0]=="Successfully Updated"){
+                          
+                         //$("#cat-form").trigger("reset");
+                         $(".add-item").show();
+                         alert(data[0]); 
+                         location.reload();
+   
+                        }
+                        else{
+                          alert("Something went wrong");
+                        }
+                    },
+                    error : function(request,error)
+                    {
+                        alert(error);
+                    }
+                }); 
+   
+    }  
+   
+   }); 
+   $(document).on('change', '.mark-complete', function(e){
+     
+     e.preventDefault(); 
+     tid = $(this).attr("data-txt");
+     if($(this).val()=="Rejected"){
+      alert_txt = 'Are you sure you want to mark it as Rejected';
+     }else{
+      alert_txt = 'Are you sure you want to mark it as Complete';
+     }
+     if (confirm(alert_txt)) {
+      
+     $.ajax({
+    
+                    url : "{{url('/updateStatus')}}",
+                    type : 'GET',
+                    data : {tid : tid,'status': $(this).val()},
+                    dataType:'text',
+                    beforeSend: function(){
+                      $("#loading").show();
+                      //$(".enquiry-status-form").hide();
+                    },
+                    complete: function(){
+                      $("#loading").hide();
+                      //$(".enquiry-status-form").show();
+                    },
+                    success : function(data) {  
+                      data = data.split("|");            
+                        if(data[0]=="Successfully Updated"){
+                         
+                         
+                         alert(data[0]); 
+                         location.reload();
+                        }else{
+                          alert("Something went wrong");
+                        }
+                    },
+                    error : function(request,error)
+                    {
+                        alert(error);
+                    }
+     }); 
+   }
+      
+   
+   }); 
+$(document).on('click', '#profile-tab', function(){
+  cat_completed_table= "";
+  if(cat_completed_table!=""){
+
+
+   cat_completed_table = $('#dataTable_completed').DataTable( {
+         //"order": false,
+         "language": {
+             //"search": '<i class="fa fa-search"></i>',
+             "searchPlaceholder": "Search by any attribute",
+             
+         },
+         "order": [[6,'desc']],
+         "columnDefs" : [{"targets":4, "sType": "eu_date"}],
+     }); 
+    
+  }
+
+   
+
+});
+
+ $(document).on('click', '.edit-btn', function(e){
+
+      e.preventDefault(); 
+      tid = $(this).attr("data-tid");
+      
+     if($("#item_edit_"+tid).val().trim()==""){
+      
+       $("#vaidation-message-edit").html("Enter Topic");
+       return false;
+     }else if($("#due_date_edit_"+tid).val().trim()==""){
+       $("#vaidation-message-edit").html("Enter Due Date");
+       return false;
+     }
+     else{
+   
+   
+      $.ajax({
+    
+                    url : "{{url('/updateItem')}}",
+                    type : 'POST',
+                    data : $("#item-edit-form_"+tid).serialize()+ "&tid="+tid,
+                    dataType:'text',
+                    beforeSend: function(){
+                      $("#loading").show();
+                      //$(".enquiry-status-form").hide();
+                    },
+                    complete: function(){
+                      $("#loading").hide();
+                      //$(".enquiry-status-form").show();
+                    },
+                    success : function(data) {  
+                      
+                      data = data.split("|");            
+                        if(data[0]=="Successfully Updated"){
+                          
+                         //$("#cat-form").trigger("reset");
+                         alert(data[0]); 
+                         location.reload();
+   
+                        }
+                        else{
+                          alert("Something went wrong");
+                        }
+                    },
+                    error : function(request,error)
+                    {
+                        alert(error);
+                    }
+                });
+   
+     }
+    
+   
+    
+
+ });
+
+ $(document).on('mouseover', '.hoverable', function(){
+    tid = $(this).attr('text');
+    $(".show-on-hover-"+tid).show();
+});
+ 
+ $(document).on('mouseleave', '.hoverable', function(){
+    tid = $(this).attr('text');
+    $(".show-on-hover-"+tid).hide();
+});
+
+
+
+
+});  
+
+function confirm_click(item_id)
+{
+
+  var url = "{{ url('/itemDelete', 'id') }}";
+  url = url.replace('id', item_id);
+  if(confirm("Are you sure you want to delete Topic?")){
+    window.location.href = url;
+  }
+ 
+}    
+</script>              
+@endsection
+
